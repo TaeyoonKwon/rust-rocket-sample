@@ -1,0 +1,16 @@
+[package]
+name = "rust-rocket-sample"
+version = "0.1.1"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket =  { version = "0.5.0-rc.1", default-features = false, features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+schemars = "0.8"
+okapi = { version = "0.6.0-alpha-1" }
+rocket_okapi = { version = "0.8.0-alpha-1", features = ["swagger"] }
+dotenv = "0.15.0"
+mongodb = "2.1.0"
+futures = "0.3"
