@@ -21,27 +21,27 @@ pub async fn get_customers(
     db: &State<Database>,
     limit: i64,
     page: Option<i64>,
-) -> Result<Json<Vec<Customer>>, Json<MessageResponse>> {
+) -> Result<Json<Vec<Customer>>, BadRequest<Json<MessageResponse>>> {
     // Error handling
     if limit < 0 {
-        return Err(Json(MessageResponse {
+        return Err(BadRequest(Some(Json(MessageResponse {
             message: "limit cannot be less than 0".to_string(),
-        }));
+        }))));
     }
 
     if !page.is_none() && page.unwrap() < 1 {
-        return Err(Json(MessageResponse {
+        return Err(BadRequest(Some(Json(MessageResponse {
             message: "page cannot be less than 1".to_string(),
-        }));
+        }))));
     }
 
     match find_customer(&db, limit, if page.is_none() { 1 } else { page.unwrap() }).await {
         Ok(_customer_docs) => Ok(Json(_customer_docs)),
         Err(_error) => {
             println!("{:?}", _error);
-            Err(Json(MessageResponse {
-                message: "error".to_string(),
-            }))
+            Err(BadRequest(Some(Json(MessageResponse {
+                message: _error.to_string(),
+            }))))
         }
     }
 }
@@ -51,18 +51,22 @@ pub async fn get_customers(
 pub async fn get_customer_by_id(
     db: &State<Database>,
     _id: String,
-) -> Result<Json<Customer>, BadRequest<String>> {
-    let oid = ObjectId::parse_str(_id);
+) -> Result<Json<Customer>, BadRequest<Json<MessageResponse>>> {
+    let oid = ObjectId::parse_str(&_id);
 
     if oid.is_err() {
-        return Err(BadRequest(Some("Invalid ObjectId".to_string())));
+        return Err(BadRequest(Some(Json(MessageResponse {
+            message: format!("Invalid document id {}", &_id),
+        }))));
     }
 
     match find_customer_by_id(&db, oid.unwrap()).await {
         Ok(_customer_doc) => Ok(Json(_customer_doc)),
         Err(_error) => {
             println!("{:?}", _error);
-            Err(BadRequest(Some("Not found".to_string())))
+            Err(BadRequest(Some(Json(MessageResponse {
+                message: "No document found".to_string(),
+            }))))
         }
     }
 }
