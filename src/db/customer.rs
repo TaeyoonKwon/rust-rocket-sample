@@ -6,7 +6,9 @@ use crate::models::customer::CustomerInput;
 use futures::stream::TryStreamExt;
 use mongodb::bson::oid::ObjectId;
 use mongodb::bson::{doc, DateTime, Document};
+use mongodb::options::FindOneAndUpdateOptions;
 use mongodb::options::FindOptions;
+use mongodb::options::ReturnDocument;
 use mongodb::Database;
 use rocket::serde::json::Json;
 
@@ -71,4 +73,54 @@ pub async fn insert_customer(
         .await?;
 
     Ok(insert_one_result.inserted_id.to_string())
+}
+
+pub async fn update_customer_by_id(
+    db: &Database,
+    oid: ObjectId,
+    input: Json<CustomerInput>,
+) -> mongodb::error::Result<Customer> {
+    let collection = db.collection::<CustomerDocument>("customer");
+    let find_one_and_update_options = FindOneAndUpdateOptions::builder()
+        .return_document(ReturnDocument::After)
+        .build();
+
+    let created_at: DateTime = DateTime::now();
+
+    let customer_doc = collection
+        .find_one_and_update(
+            doc! {"_id":oid },
+            doc! {"name": input.name.clone(), "createdAt": created_at},
+            find_one_and_update_options,
+        )
+        .await?
+        .unwrap();
+    // transform ObjectId to String
+    let customer_json = Customer {
+        _id: customer_doc._id.to_string(),
+        name: customer_doc.name.to_string(),
+        createdAt: customer_doc.createdAt.to_string(),
+    };
+
+    Ok(customer_json)
+}
+
+pub async fn delete_customer_by_id(
+    db: &Database,
+    oid: ObjectId,
+) -> mongodb::error::Result<Customer> {
+    let collection = db.collection::<CustomerDocument>("customer");
+
+    let customer_doc = collection
+        .find_one_and_delete(doc! {"_id":oid }, None)
+        .await?
+        .unwrap();
+    // transform ObjectId to String
+    let customer_json = Customer {
+        _id: customer_doc._id.to_string(),
+        name: customer_doc.name.to_string(),
+        createdAt: customer_doc.createdAt.to_string(),
+    };
+
+    Ok(customer_json)
 }
