@@ -23,7 +23,12 @@ async fn rocket() -> _ {
         .attach(db::init().await)
         .mount(
             "/",
-            openapi_get_routes![routes::index, routes::customer::get_customers],
+            openapi_get_routes![
+                routes::index,
+                routes::customer::get_customers,
+                routes::customer::get_customer_by_id,
+                routes::customer::post_customer
+            ],
         )
         .mount("/api-docs", make_swagger_ui(&get_docs()))
 }
