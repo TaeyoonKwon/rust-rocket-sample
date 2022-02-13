@@ -6,15 +6,10 @@ use rocket_okapi::openapi_get_routes;
 use rocket_okapi::swagger_ui::{make_swagger_ui, SwaggerUIConfig};
 
 mod db;
+mod errors;
 mod models;
+mod request_guards;
 mod routes;
-
-fn get_docs() -> SwaggerUIConfig {
-    SwaggerUIConfig {
-        url: "/openapi.json".to_string(),
-        ..Default::default()
-    }
-}
 
 #[launch]
 async fn rocket() -> _ {
@@ -32,5 +27,11 @@ async fn rocket() -> _ {
                 routes::customer::delete_customer_by_id
             ],
         )
-        .mount("/api-docs", make_swagger_ui(&get_docs()))
+        .mount(
+            "/api-docs",
+            make_swagger_ui(&SwaggerUIConfig {
+                url: "../openapi.json".to_owned(),
+                ..Default::default()
+            }),
+        )
 }

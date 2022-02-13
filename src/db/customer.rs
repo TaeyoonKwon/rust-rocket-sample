@@ -43,18 +43,25 @@ pub async fn find_customer(
     Ok(customers)
 }
 
-pub async fn find_customer_by_id(db: &Database, oid: ObjectId) -> mongodb::error::Result<Customer> {
+pub async fn find_customer_by_id(
+    db: &Database,
+    oid: ObjectId,
+) -> mongodb::error::Result<Option<Customer>> {
     let collection = db.collection::<CustomerDocument>("customer");
 
-    let customer_doc = collection.find_one(doc! {"_id":oid }, None).await?.unwrap();
+    let customer_doc = collection.find_one(doc! {"_id":oid }, None).await?;
+    if customer_doc.is_none() {
+        return Ok(None);
+    }
+    let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: customer_doc._id.to_string(),
-        name: customer_doc.name.to_string(),
-        createdAt: customer_doc.createdAt.to_string(),
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name.to_string(),
+        createdAt: unwrapped_doc.createdAt.to_string(),
     };
 
-    Ok(customer_json)
+    Ok(Some(customer_json))
 }
 
 pub async fn insert_customer(
@@ -79,7 +86,7 @@ pub async fn update_customer_by_id(
     db: &Database,
     oid: ObjectId,
     input: Json<CustomerInput>,
-) -> mongodb::error::Result<Customer> {
+) -> mongodb::error::Result<Option<Customer>> {
     let collection = db.collection::<CustomerDocument>("customer");
     let find_one_and_update_options = FindOneAndUpdateOptions::builder()
         .return_document(ReturnDocument::After)
@@ -93,34 +100,43 @@ pub async fn update_customer_by_id(
             doc! {"name": input.name.clone(), "createdAt": created_at},
             find_one_and_update_options,
         )
-        .await?
-        .unwrap();
+        .await?;
+
+    if customer_doc.is_none() {
+        return Ok(None);
+    }
+    let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: customer_doc._id.to_string(),
-        name: customer_doc.name.to_string(),
-        createdAt: customer_doc.createdAt.to_string(),
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name.to_string(),
+        createdAt: unwrapped_doc.createdAt.to_string(),
     };
 
-    Ok(customer_json)
+    Ok(Some(customer_json))
 }
 
 pub async fn delete_customer_by_id(
     db: &Database,
     oid: ObjectId,
-) -> mongodb::error::Result<Customer> {
+) -> mongodb::error::Result<Option<Customer>> {
     let collection = db.collection::<CustomerDocument>("customer");
 
+    // if you just unwrap,, when there is no document it results in 500 error.
     let customer_doc = collection
         .find_one_and_delete(doc! {"_id":oid }, None)
-        .await?
-        .unwrap();
+        .await?;
+    if customer_doc.is_none() {
+        return Ok(None);
+    }
+
+    let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: customer_doc._id.to_string(),
-        name: customer_doc.name.to_string(),
-        createdAt: customer_doc.createdAt.to_string(),
+        _id: unwrapped_doc._id.to_string(),
+        name: unwrapped_doc.name.to_string(),
+        createdAt: unwrapped_doc.createdAt.to_string(),
     };
 
-    Ok(customer_json)
+    Ok(Some(customer_json))
 }
