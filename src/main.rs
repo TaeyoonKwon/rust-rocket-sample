@@ -7,6 +7,7 @@ use rocket_okapi::swagger_ui::{make_swagger_ui, SwaggerUIConfig};
 
 mod db;
 mod errors;
+mod fairings;
 mod models;
 mod request_guards;
 mod routes;
@@ -16,6 +17,7 @@ async fn rocket() -> _ {
     dotenv().ok();
     rocket::build()
         .attach(db::init().await)
+        .attach(fairings::cors::CORS)
         .mount(
             "/",
             openapi_get_routes![
