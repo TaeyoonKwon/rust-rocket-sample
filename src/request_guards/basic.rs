@@ -10,7 +10,7 @@ use rocket_okapi::{
 };
 use std::env;
 
-use crate::errors::response::{bad_request_response, unauthorized_response};
+use crate::errors::response::unauthorized_response;
 
 // #[derive(OpenApiFromRequest)]
 pub struct ApiKey(String);
@@ -61,7 +61,7 @@ impl<'a> OpenApiFromRequest<'a> for ApiKey {
         // Each security requirement needs to be met before access is allowed.
         security_req.insert("ApiKey".to_owned(), Vec::new());
         Ok(RequestHeaderInput::Security(
-            "ApiKeyAuth".to_owned(),
+            "ApiKey".to_owned(),
             security_scheme,
             security_req,
         ))
@@ -71,7 +71,6 @@ impl<'a> OpenApiFromRequest<'a> for ApiKey {
         use rocket_okapi::okapi::openapi3::RefOr;
         Ok(Responses {
             responses: okapi::map! {
-                "400".to_owned() => RefOr::Object(bad_request_response(gen)),
                 "401".to_owned() => RefOr::Object(unauthorized_response(gen)),
             },
             ..Default::default()

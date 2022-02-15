@@ -22,10 +22,12 @@ pub struct MyError {
 }
 
 impl MyError {
+    // building a custom error.
     pub fn build(code: u16, description: Option<String>) -> MyError {
         let reason: String;
         match code {
             400 => reason = "Bad Request".to_string(),
+            401 => reason = "Unauthorized".to_string(),
             _ => reason = "Error".to_string(),
         }
         MyError {
@@ -93,7 +95,8 @@ impl OpenApiResponderInner for MyError {
         Ok(Responses {
             responses: okapi::map! {
                 "400".to_owned() => RefOr::Object(bad_request_response(gen)),
-                "401".to_owned() => RefOr::Object(unauthorized_response(gen)),
+                // Note: 401 is already declared for ApiKey. so this is not essential.
+                // "401".to_owned() => RefOr::Object(unauthorized_response(gen)),
             },
             ..Default::default()
         })
