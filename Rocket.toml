@@ -2,19 +2,9 @@
 # You should generate your own by "openssl rand -base64 32"
 secret_key = "Yuvzw+jJ4yzKHi/JwHFl1y4X6Tjn/WrskHOWrlvt/L0="
 
-[staging]
-address = "0.0.0.0"
-port = 8000
-keep_alive = 5
-read_timeout = 5
-write_timeout = 5
-log_level = "normal"
-secret_key = "TDpuEwYtEz7xz/N+diE85A9kPkb0ZWQkvqTowxBepiI="
-limits = { forms = 32768 }
-
 [release]
 address = "0.0.0.0"
-port = 8000
+port = 8080
 keep_alive = 5
 read_timeout = 5
 write_timeout = 5

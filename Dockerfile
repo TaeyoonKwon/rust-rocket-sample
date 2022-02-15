@@ -9,8 +9,6 @@ COPY --from=builder /usr/local/cargo/bin/rust-rocket-sample /usr/local/bin/rust-
 COPY --from=builder /app/.env .env
 COPY --from=builder /app/Rocket.toml Rocket.toml
 
-# ENV ROCKET_ADDRESS=0.0.0.0
-
-EXPOSE 8000
+EXPOSE 8080
 
 CMD ["rust-rocket-sample"]
