@@ -15,5 +15,6 @@ Fully working example CRUD REST api using
 ### release mode
 > cargo build --release && cargo run --release
 
-## 📑 License
+
+### 📑 License
 MIT
