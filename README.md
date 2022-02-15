@@ -1,6 +1,6 @@
 # rust-rocket-sample
 
-Fully working example CRUD REST api using
+Fully working CRUD REST API example using
 - Rust (stable)
 - Rocket.rs
 - mongodb
