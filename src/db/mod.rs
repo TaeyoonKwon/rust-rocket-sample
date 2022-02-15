@@ -6,7 +6,7 @@ use std::env;
 
 pub mod customer;
 
-pub async fn init() -> AdHoc {
+pub fn init() -> AdHoc {
     AdHoc::on_ignite("Connecting to MongoDB", |rocket| async {
         match connect().await {
             Ok(database) => rocket.manage(database),
@@ -24,6 +24,8 @@ async fn connect() -> mongodb::error::Result<Database> {
     let client_options = ClientOptions::parse(mongo_uri).await?;
     let client = Client::with_options(client_options)?;
     let database = client.database(mongo_db_name.as_str());
+
+    println!("MongoDB Connected!");
 
     Ok(database)
 }

@@ -13,10 +13,10 @@ mod request_guards;
 mod routes;
 
 #[launch]
-async fn rocket() -> _ {
+fn rocket() -> _ {
     dotenv().ok();
     rocket::build()
-        .attach(db::init().await)
+        .attach(db::init())
         .attach(fairings::cors::CORS)
         .mount(
             "/",
@@ -37,3 +37,7 @@ async fn rocket() -> _ {
             }),
         )
 }
+
+// Unit testings
+#[cfg(test)]
+mod tests;
