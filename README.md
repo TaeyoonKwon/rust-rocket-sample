@@ -16,5 +16,7 @@ Fully working CRUD REST API example using
 > cargo build --release && cargo run --release
 
 
+_You should create your own `.env` file including `MONGO_URI`, `MONGO_DB_NAME`, and `API_KEY` to run it._
+
 ### 📑 License
 MIT
