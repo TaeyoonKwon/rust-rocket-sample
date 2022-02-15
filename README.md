@@ -1,4 +1,5 @@
 # rust-rocket-sample
+[![CI](https://github.com/TaeyoonKwon/rust-rocket-sample/actions/workflows/ci.yaml/badge.svg)](https://github.com/TaeyoonKwon/rust-rocket-sample/actions/workflows/ci.yaml)
 
 Fully working CRUD REST API example using
 - Rust (stable)
