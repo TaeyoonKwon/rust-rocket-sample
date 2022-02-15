@@ -15,5 +15,6 @@ Cargo.lock
 /target
 
 
-# env
+# env & config
 .env
+config.toml

@@ -1,0 +1,10 @@
+# compiled output
+.vscode
+
+# git
+.git/
+.gitignore
+
+# docker
+Dockerfile
+docker-compose.yml
