@@ -1,3 +1,7 @@
 # rust-rocket-sample
 
-Building a sample REST api using Rust, Rocket.rs, mongodb, and Okapi
+Fully working example CRUD REST api using
+- Rust
+- Rocket.rs
+- mongodb
+- okapi
