@@ -8,7 +8,7 @@ Fully working CRUD REST API example using
 - okapi
 
 
-## How to Run
+## 🔧 Building and Testing
 
 ### debug mode
 > cargo run
@@ -20,8 +20,9 @@ Fully working CRUD REST API example using
 ### unit testing
 > cargo test
 
+<br/>
 
 ℹ️ _You should create your own `.env` file including `MONGO_URI`, `MONGO_DB_NAME`, and `API_KEY` to run it._
 
-### 📑 License
+## 📑 License
 MIT
