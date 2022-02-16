@@ -25,4 +25,4 @@ Fully working CRUD REST API example using
 ℹ️ _You should create your own `.env` file including `MONGO_URI`, `MONGO_DB_NAME`, and `API_KEY` to run it._
 
 ## 📑 License
-MIT
+MIT Copyright (c) 2022 Taeyoon Kwon
