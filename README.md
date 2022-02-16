@@ -8,6 +8,17 @@ Fully working CRUD REST API example using
 - okapi
 
 
+## 🚀 Features
+- Establish MongoDB connection using rocket Adhoc fairing.
+- Custom error handlings with rocket Responder and okapi OpenApiGenerator.
+- CORS fairing and Counter fairing to demonstrate how fairing works.
+- Example model Customer to demonstrate how Rust structs interact with MongoDB.
+- Request guard using ApiKey.
+- REST API endpoints with simple CRUD using Customer model.
+- Implement Open API documentation using okapi.
+- Test codes to test API endpoints.
+
+
 ## 🔧 Building and Testing
 
 ### debug mode
