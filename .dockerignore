@@ -8,3 +8,6 @@
 # docker
 Dockerfile
 docker-compose.yml
+
+# github
+.github/
