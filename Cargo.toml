@@ -1,7 +1,7 @@
 [package]
 name = "rust-rocket-sample"
 description = "Rocket.rs CRUD REST API example"
-version = "1.2.0"
+version = "1.3.0"
 edition = "2021"
 authors = ["TaeyoonKwon <tabriell@gmail.com>"]
 readme = "README.md"
