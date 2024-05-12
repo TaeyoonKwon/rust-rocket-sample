@@ -5,7 +5,7 @@ use rocket::fairing::{Fairing, Info, Kind};
 use rocket::http::{ContentType, Method, Status};
 use rocket::{Data, Request, Response};
 
-struct Counter {
+pub struct Counter {
     get: AtomicUsize,
     post: AtomicUsize,
 }

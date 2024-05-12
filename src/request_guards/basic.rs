@@ -32,9 +32,9 @@ impl<'r> FromRequest<'r> for ApiKey {
         }
 
         match req.headers().get_one("x-api-key") {
-            None => Outcome::Failure((Status::Unauthorized, ApiKeyError::Missing)),
+            None => Outcome::Error((Status::Unauthorized, ApiKeyError::Missing)),
             Some(key) if is_valid(key) => Outcome::Success(ApiKey(key.to_owned())),
-            Some(_) => Outcome::Failure((Status::Unauthorized, ApiKeyError::Invalid)),
+            Some(_) => Outcome::Error((Status::Unauthorized, ApiKeyError::Invalid)),
         }
     }
 }

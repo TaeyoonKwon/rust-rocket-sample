@@ -1,20 +1,19 @@
-use mongodb::bson::doc;
-use mongodb::bson::oid::ObjectId;
-use mongodb::Database;
-use rocket::response::status::BadRequest;
-use rocket::serde::json::Json;
-use rocket::State;
+use mongodb::{
+    bson::{doc, oid::ObjectId},
+    Database,
+};
+use rocket::{response::status::BadRequest, serde::json::Json, State};
 use rocket_okapi::openapi;
 
-use crate::models::customer::Customer;
-use crate::models::customer::CustomerInput;
-use crate::models::response::MessageResponse;
-
-use crate::request_guards::basic::ApiKey;
-
-use crate::db::customer;
-
-use crate::errors::response::MyError;
+use crate::{
+    db::customer,
+    errors::response::MyError,
+    models::{
+        customer::{Customer, CustomerInput},
+        response::MessageResponse,
+    },
+    request_guards::basic::ApiKey,
+};
 
 /// get customer documents
 #[openapi(tag = "Customer")]
@@ -51,32 +50,29 @@ pub async fn get_customers(
 
 /// get customer document by _id
 #[openapi(tag = "Customer")]
-#[get("/customer/<_id>")]
-pub async fn get_customer_by_id(
-    db: &State<Database>,
-    _id: String,
-) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(&_id);
+#[get("/customer/<id>")]
+pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<Customer>, MyError> {
+    let oid = ObjectId::parse_str(&id);
 
     if oid.is_err() {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
     }
 
     match customer::find_customer_by_id(&db, oid.unwrap()).await {
-        Ok(_customer_doc) => {
-            if _customer_doc.is_none() {
+        Ok(customer_doc) => {
+            if customer_doc.is_none() {
                 return Err(MyError::build(
                     400,
-                    Some(format!("Customer not found with _id {}", &_id)),
+                    Some(format!("Customer not found with _id {}", &id)),
                 ));
             }
-            Ok(Json(_customer_doc.unwrap()))
+            Ok(Json(customer_doc.unwrap()))
         }
-        Err(_error) => {
-            println!("{:?}", _error);
+        Err(error) => {
+            println!("{:?}", error);
             return Err(MyError::build(
                 400,
-                Some(format!("Customer not found with _id {}", &_id)),
+                Some(format!("Customer not found with _id {}", &id)),
             ));
         }
     }
@@ -91,48 +87,48 @@ pub async fn post_customer(
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     // can set with a single error like this.
     match customer::insert_customer(&db, input).await {
-        Ok(_customer_doc_id) => {
-            return Ok(Json(_customer_doc_id));
+        Ok(customer_doc_id) => {
+            return Ok(Json(customer_doc_id));
         }
-        Err(_error) => {
-            println!("{:?}", _error);
-            return Err(BadRequest(Some(Json(MessageResponse {
+        Err(error) => {
+            println!("{:?}", error);
+            return Err(BadRequest(Json(MessageResponse {
                 message: format!("Invalid input"),
-            }))));
+            })));
         }
     }
 }
 
 /// update a customer document by _id
 #[openapi(tag = "Customer")]
-#[patch("/customer/<_id>", data = "<input>")]
+#[patch("/customer/<id>", data = "<input>")]
 pub async fn patch_customer_by_id(
     db: &State<Database>,
     _key: ApiKey,
-    _id: String,
+    id: &str,
     input: Json<CustomerInput>,
 ) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(&_id);
+    let oid = ObjectId::parse_str(&id);
 
     if oid.is_err() {
-        return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
+        return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     }
 
     match customer::update_customer_by_id(&db, oid.unwrap(), input).await {
-        Ok(_customer_doc) => {
-            if _customer_doc.is_none() {
+        Ok(customer_doc) => {
+            if customer_doc.is_none() {
                 return Err(MyError::build(
                     400,
-                    Some(format!("Customer not found with _id {}", &_id)),
+                    Some(format!("Customer not found with id {}", &id)),
                 ));
             }
-            Ok(Json(_customer_doc.unwrap()))
+            Ok(Json(customer_doc.unwrap()))
         }
-        Err(_error) => {
-            println!("{:?}", _error);
+        Err(error) => {
+            println!("{:?}", error);
             return Err(MyError::build(
                 400,
-                Some(format!("Customer not found with _id {}", &_id)),
+                Some(format!("Customer not found with id {}", &id)),
             ));
         }
     }
@@ -140,33 +136,33 @@ pub async fn patch_customer_by_id(
 
 /// delete a customer document by _id
 #[openapi(tag = "Customer")]
-#[delete("/customer/<_id>")]
+#[delete("/customer/<id>")]
 pub async fn delete_customer_by_id(
     db: &State<Database>,
-    _id: String,
+    id: &str,
     _key: ApiKey,
 ) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(&_id);
+    let oid = ObjectId::parse_str(&id);
 
     if oid.is_err() {
-        return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
+        return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     }
 
     match customer::delete_customer_by_id(&db, oid.unwrap()).await {
-        Ok(_customer_doc) => {
-            if _customer_doc.is_none() {
+        Ok(customer_doc) => {
+            if customer_doc.is_none() {
                 return Err(MyError::build(
                     400,
-                    Some(format!("Customer not found with _id {}", &_id)),
+                    Some(format!("Customer not found with id {}", &id)),
                 ));
             }
-            Ok(Json(_customer_doc.unwrap()))
+            Ok(Json(customer_doc.unwrap()))
         }
-        Err(_error) => {
-            println!("{:?}", _error);
+        Err(error) => {
+            println!("{:?}", error);
             return Err(MyError::build(
                 400,
-                Some(format!("Customer not found with _id {}", &_id)),
+                Some(format!("Customer not found with _id {}", &id)),
             ));
         }
     }
