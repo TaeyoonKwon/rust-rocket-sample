@@ -1,5 +1,4 @@
-use mongodb::bson::oid::ObjectId;
-use mongodb::bson::DateTime;
+use mongodb::bson::{oid::ObjectId, DateTime};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

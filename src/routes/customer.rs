@@ -40,11 +40,11 @@ pub async fn get_customers(
     let limit: i64 = limit.unwrap_or(12);
     let page: i64 = page.unwrap_or(1);
     match customer::find_customer(db, limit, page).await {
-        Ok(_customer_docs) => Ok(Json(_customer_docs)),
-        Err(_error) => {
-            println!("{:?}", _error);
+        Ok(customer_docs) => Ok(Json(customer_docs)),
+        Err(error) => {
+            println!("{:?}", error);
 
-            Err(MyError::build(400, Some(_error.to_string())))
+            Err(MyError::build(400, Some(error.to_string())))
         }
     }
 }

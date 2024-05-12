@@ -12,7 +12,6 @@ use std::env;
 
 use crate::errors::response::unauthorized_response;
 
-// #[derive(OpenApiFromRequest)]
 #[allow(dead_code)]
 pub struct ApiKey(String);
 

@@ -1,8 +1,12 @@
-use rocket_okapi::gen::OpenApiGenerator;
-use rocket_okapi::okapi;
-use rocket_okapi::okapi::openapi3::{MediaType, Responses};
-use rocket_okapi::response::OpenApiResponderInner;
-use rocket_okapi::OpenApiError;
+use rocket_okapi::{
+    gen::OpenApiGenerator,
+    okapi::{
+        self,
+        openapi3::{MediaType, Responses},
+    },
+    response::OpenApiResponderInner,
+    OpenApiError,
+};
 
 /// error type
 #[derive(Debug, serde::Serialize, schemars::JsonSchema)]
