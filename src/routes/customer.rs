@@ -39,11 +39,12 @@ pub async fn get_customers(
     // Setting default values
     let limit: i64 = limit.unwrap_or(12);
     let page: i64 = page.unwrap_or(1);
-    match customer::find_customer(&db, limit, page).await {
+    match customer::find_customer(db, limit, page).await {
         Ok(_customer_docs) => Ok(Json(_customer_docs)),
         Err(_error) => {
             println!("{:?}", _error);
-            return Err(MyError::build(400, Some(_error.to_string())));
+            
+            Err(MyError::build(400, Some(_error.to_string())))
         }
     }
 }
@@ -52,13 +53,13 @@ pub async fn get_customers(
 #[openapi(tag = "Customer")]
 #[get("/customer/<id>")]
 pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(&id);
+    let oid = ObjectId::parse_str(id);
 
     if oid.is_err() {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
     }
 
-    match customer::find_customer_by_id(&db, oid.unwrap()).await {
+    match customer::find_customer_by_id(db, oid.unwrap()).await {
         Ok(customer_doc) => {
             if customer_doc.is_none() {
                 return Err(MyError::build(
@@ -70,10 +71,11 @@ pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<C
         }
         Err(error) => {
             println!("{:?}", error);
-            return Err(MyError::build(
+            
+            Err(MyError::build(
                 400,
                 Some(format!("Customer not found with _id {}", &id)),
-            ));
+            ))
         }
     }
 }
@@ -86,15 +88,13 @@ pub async fn post_customer(
     input: Json<CustomerInput>,
 ) -> Result<Json<String>, BadRequest<Json<MessageResponse>>> {
     // can set with a single error like this.
-    match customer::insert_customer(&db, input).await {
-        Ok(customer_doc_id) => {
-            return Ok(Json(customer_doc_id));
-        }
+    match customer::insert_customer(db, input).await {
+        Ok(customer_doc_id) => Ok(Json(customer_doc_id)),
         Err(error) => {
             println!("{:?}", error);
-            return Err(BadRequest(Json(MessageResponse {
-                message: format!("Invalid input"),
-            })));
+            Err(BadRequest(Json(MessageResponse {
+                message: "Invalid input".to_string(),
+            })))
         }
     }
 }
@@ -108,13 +108,13 @@ pub async fn patch_customer_by_id(
     id: &str,
     input: Json<CustomerInput>,
 ) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(&id);
+    let oid = ObjectId::parse_str(id);
 
     if oid.is_err() {
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     }
 
-    match customer::update_customer_by_id(&db, oid.unwrap(), input).await {
+    match customer::update_customer_by_id(db, oid.unwrap(), input).await {
         Ok(customer_doc) => {
             if customer_doc.is_none() {
                 return Err(MyError::build(
@@ -126,10 +126,10 @@ pub async fn patch_customer_by_id(
         }
         Err(error) => {
             println!("{:?}", error);
-            return Err(MyError::build(
+            Err(MyError::build(
                 400,
                 Some(format!("Customer not found with id {}", &id)),
-            ));
+            ))
         }
     }
 }
@@ -142,13 +142,13 @@ pub async fn delete_customer_by_id(
     id: &str,
     _key: ApiKey,
 ) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(&id);
+    let oid = ObjectId::parse_str(id);
 
     if oid.is_err() {
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
     }
 
-    match customer::delete_customer_by_id(&db, oid.unwrap()).await {
+    match customer::delete_customer_by_id(db, oid.unwrap()).await {
         Ok(customer_doc) => {
             if customer_doc.is_none() {
                 return Err(MyError::build(
@@ -160,10 +160,10 @@ pub async fn delete_customer_by_id(
         }
         Err(error) => {
             println!("{:?}", error);
-            return Err(MyError::build(
+            Err(MyError::build(
                 400,
                 Some(format!("Customer not found with _id {}", &id)),
-            ));
+            ))
         }
     }
 }

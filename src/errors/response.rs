@@ -24,12 +24,11 @@ pub struct MyError {
 impl MyError {
     // building a custom error.
     pub fn build(code: u16, description: Option<String>) -> MyError {
-        let reason: String;
-        match code {
-            400 => reason = "Bad Request".to_string(),
-            401 => reason = "Unauthorized".to_string(),
-            _ => reason = "Error".to_string(),
-        }
+        let reason = match code {
+            400 =>  "Bad Request".to_string(),
+            401 =>  "Unauthorized".to_string(),
+            _ =>  "Error".to_string(),
+        };
         MyError {
             error: ErrorContent {
                 code,
