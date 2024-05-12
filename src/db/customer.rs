@@ -1,15 +1,12 @@
-use crate::models::customer::Customer;
-use crate::models::customer::CustomerDocument;
-use crate::models::customer::CustomerInput;
+use crate::models::customer::{Customer, CustomerDocument, CustomerInput};
 
 // use chrono::prelude::*;
 use futures::stream::TryStreamExt;
-use mongodb::bson::oid::ObjectId;
-use mongodb::bson::{doc, DateTime, Document};
-use mongodb::options::FindOneAndUpdateOptions;
-use mongodb::options::FindOptions;
-use mongodb::options::ReturnDocument;
-use mongodb::Database;
+use mongodb::{
+    bson::{doc, oid::ObjectId, DateTime, Document},
+    options::{FindOneAndUpdateOptions, FindOptions, ReturnDocument},
+    Database,
+};
 use rocket::serde::json::Json;
 
 pub async fn find_customer(

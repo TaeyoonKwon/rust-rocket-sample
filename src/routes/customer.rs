@@ -43,7 +43,7 @@ pub async fn get_customers(
         Ok(_customer_docs) => Ok(Json(_customer_docs)),
         Err(_error) => {
             println!("{:?}", _error);
-            
+
             Err(MyError::build(400, Some(_error.to_string())))
         }
     }
@@ -71,7 +71,7 @@ pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<C
         }
         Err(error) => {
             println!("{:?}", error);
-            
+
             Err(MyError::build(
                 400,
                 Some(format!("Customer not found with _id {}", &id)),

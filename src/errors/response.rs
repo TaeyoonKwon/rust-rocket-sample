@@ -25,9 +25,9 @@ impl MyError {
     // building a custom error.
     pub fn build(code: u16, description: Option<String>) -> MyError {
         let reason = match code {
-            400 =>  "Bad Request".to_string(),
-            401 =>  "Unauthorized".to_string(),
-            _ =>  "Error".to_string(),
+            400 => "Bad Request".to_string(),
+            401 => "Unauthorized".to_string(),
+            _ => "Error".to_string(),
         };
         MyError {
             error: ErrorContent {
