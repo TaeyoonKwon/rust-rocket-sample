@@ -1,6 +1,5 @@
 use crate::models::customer::{Customer, CustomerDocument, CustomerInput};
-
-// use chrono::prelude::*;
+use chrono::Utc;
 use futures::stream::TryStreamExt;
 use mongodb::{
     bson::{doc, oid::ObjectId, DateTime, Document},
@@ -25,14 +24,14 @@ pub async fn find_customer(
 
     let mut customers: Vec<Customer> = vec![];
     while let Some(result) = cursor.try_next().await? {
-        let _id = result._id;
+        let _id = result.id;
         let name = result.name;
-        let created_at = result.createdAt;
+        let created_at = result.created_at;
         // transform ObjectId to String
         let customer_json = Customer {
-            _id: _id.to_string(),
+            id: _id.to_string(),
             name: name.to_string(),
-            createdAt: created_at.to_string(),
+            created_at: created_at.to_string(),
         };
         customers.push(customer_json);
     }
@@ -53,9 +52,9 @@ pub async fn find_customer_by_id(
     let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: unwrapped_doc._id.to_string(),
+        id: unwrapped_doc.id.to_string(),
         name: unwrapped_doc.name.to_string(),
-        createdAt: unwrapped_doc.createdAt.to_string(),
+        created_at: unwrapped_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
@@ -67,7 +66,7 @@ pub async fn insert_customer(
 ) -> mongodb::error::Result<String> {
     let collection = db.collection::<Document>("customer");
 
-    let created_at: DateTime = DateTime::now();
+    let created_at = Utc::now();
 
     let insert_one_result = collection
         .insert_one(
@@ -105,9 +104,9 @@ pub async fn update_customer_by_id(
     let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: unwrapped_doc._id.to_string(),
+        id: unwrapped_doc.id.to_string(),
         name: unwrapped_doc.name.to_string(),
-        createdAt: unwrapped_doc.createdAt.to_string(),
+        created_at: unwrapped_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
@@ -130,9 +129,9 @@ pub async fn delete_customer_by_id(
     let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: unwrapped_doc._id.to_string(),
+        id: unwrapped_doc.id.to_string(),
         name: unwrapped_doc.name.to_string(),
-        createdAt: unwrapped_doc.createdAt.to_string(),
+        created_at: unwrapped_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))

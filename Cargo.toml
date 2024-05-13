@@ -1,23 +1,43 @@
 [package]
 name = "rust-rocket-sample"
 description = "Rocket.rs CRUD REST API example"
-version = "1.3.0"
+version = "1.3.1"
 edition = "2021"
-authors = ["TaeyoonKwon <tabriell@gmail.com>"]
+authors = ["TaeyoonKwon <tabriell@gmail.com>", "Ismael Belisario <ismaelbeli.com@gmail.com>"]
 readme = "README.md"
-repository = "https://github.com/TaeyoonKwon/rust-rocket-sample"
+repository = "https://github.com/ismaelxyz/rust-rocket-sample"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket =  { version = "0.5.0-rc.4", default-features = false, features = ["json"] }
-serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 schemars = "0.8"
-okapi = { version = "0.7.0" }
-rocket_okapi = { version = "0.8.0", features = ["swagger", "secrets"] }
+okapi = "0.7.0"
 dotenv = "0.15.0"
-mongodb = "2.8.2"
 futures = "0.3"
-chrono = "0.4"
+
+[dependencies.rocket]
+version = "0.5.0-rc.4"
+default-features = false
+features = ["json"]
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.rocket_okapi]
+version = "0.8.0"
+features = ["swagger", "secrets"]
+
+[dependencies.mongodb]
+version = "2.8.2"
+features = ["bson-chrono-0_4"]
+
+[dependencies.bson]
+version = "2.10.0"
+features = ["chrono-0_4"]
+
+[dependencies.chrono]
+version = "0.4"
+features = ["serde"] 

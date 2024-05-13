@@ -1,4 +1,5 @@
 use super::rocket;
+use crate::models::customer::Customer;
 use crate::models::response::MessageResponse;
 use rocket::{http::Status, local::blocking::Client};
 use serde_json;
@@ -15,4 +16,14 @@ fn hello_world() {
         })
         .unwrap()
     );
+}
+
+#[test]
+fn get_all_users() {
+    let client = Client::tracked(rocket()).expect("valid rocket instance");
+    let response = client.get("/customer").dispatch();
+    assert_eq!(response.status(), Status::Ok);
+    let customer: Option<Vec<Customer>> = response.into_json();
+
+    assert!(customer.is_some());
 }

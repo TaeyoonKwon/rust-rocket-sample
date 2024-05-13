@@ -1,27 +1,33 @@
-use mongodb::bson::{oid::ObjectId, DateTime};
+use chrono::{DateTime, Utc};
+use mongodb::bson::oid::ObjectId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CustomerDocument {
     /// Document Id
-    pub _id: ObjectId,
+    #[serde(rename = "_id")]
+    pub id: ObjectId,
     /// customer name
     pub name: String,
     /// createdAt
-    pub createdAt: DateTime,
+    #[serde(
+        with = "bson::serde_helpers::chrono_datetime_as_bson_datetime",
+        rename = "createdAt"
+    )]
+    pub created_at: DateTime<Utc>,
 }
 
-#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize, JsonSchema, Clone)]
 pub struct Customer {
     /// Document Id
-    pub _id: String,
+    #[serde(rename = "_id")]
+    pub id: String,
     /// customer name
     pub name: String,
     /// createdAt
-    pub createdAt: String,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema, Clone)]
