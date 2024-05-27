@@ -41,11 +41,7 @@ pub async fn get_customers(
     let page: i64 = page.unwrap_or(1);
     match customer::find_customer(db, limit, page).await {
         Ok(customer_docs) => Ok(Json(customer_docs)),
-        Err(error) => {
-            println!("{:?}", error);
-
-            Err(MyError::build(400, Some(error.to_string())))
-        }
+        Err(error) => Err(MyError::build(400, Some(error.to_string()))),
     }
 }
 
@@ -53,30 +49,22 @@ pub async fn get_customers(
 #[openapi(tag = "Customer")]
 #[get("/customer/<id>")]
 pub async fn get_customer_by_id(db: &State<Database>, id: &str) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(id);
-
-    if oid.is_err() {
+    let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid _id format.".to_string())));
-    }
+    };
 
-    match customer::find_customer_by_id(db, oid.unwrap()).await {
-        Ok(customer_doc) => {
-            if customer_doc.is_none() {
-                return Err(MyError::build(
-                    400,
-                    Some(format!("Customer not found with _id {}", &id)),
-                ));
-            }
-            Ok(Json(customer_doc.unwrap()))
-        }
-        Err(error) => {
-            println!("{:?}", error);
-
-            Err(MyError::build(
+    match customer::find_customer_by_id(db, oid).await {
+        Ok(customer_doc) => match customer_doc {
+            None => Err(MyError::build(
                 400,
                 Some(format!("Customer not found with _id {}", &id)),
-            ))
-        }
+            )),
+            Some(customer_doc) => Ok(Json(customer_doc)),
+        },
+        Err(_error) => Err(MyError::build(
+            400,
+            Some(format!("Customer not found with _id {}", &id)),
+        )),
     }
 }
 
@@ -90,12 +78,9 @@ pub async fn post_customer(
     // can set with a single error like this.
     match customer::insert_customer(db, input).await {
         Ok(customer_doc_id) => Ok(Json(customer_doc_id)),
-        Err(error) => {
-            println!("{:?}", error);
-            Err(BadRequest(Json(MessageResponse {
-                message: "Invalid input".to_string(),
-            })))
-        }
+        Err(_error) => Err(BadRequest(Json(MessageResponse {
+            message: "Invalid input".to_string(),
+        }))),
     }
 }
 
@@ -108,29 +93,22 @@ pub async fn patch_customer_by_id(
     id: &str,
     input: Json<CustomerInput>,
 ) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(id);
-
-    if oid.is_err() {
+    let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
-    }
+    };
 
-    match customer::update_customer_by_id(db, oid.unwrap(), input).await {
-        Ok(customer_doc) => {
-            if customer_doc.is_none() {
-                return Err(MyError::build(
-                    400,
-                    Some(format!("Customer not found with id {}", &id)),
-                ));
-            }
-            Ok(Json(customer_doc.unwrap()))
-        }
-        Err(error) => {
-            println!("{:?}", error);
-            Err(MyError::build(
+    match customer::update_customer_by_id(db, oid, input).await {
+        Ok(customer_doc) => match customer_doc {
+            Some(customer_doc) => Ok(Json(customer_doc)),
+            None => Err(MyError::build(
                 400,
                 Some(format!("Customer not found with id {}", &id)),
-            ))
-        }
+            )),
+        },
+        Err(_error) => Err(MyError::build(
+            400,
+            Some(format!("Customer not found with id {}", &id)),
+        )),
     }
 }
 
@@ -142,28 +120,21 @@ pub async fn delete_customer_by_id(
     id: &str,
     _key: ApiKey,
 ) -> Result<Json<Customer>, MyError> {
-    let oid = ObjectId::parse_str(id);
-
-    if oid.is_err() {
+    let Ok(oid) = ObjectId::parse_str(id) else {
         return Err(MyError::build(400, Some("Invalid id format.".to_string())));
-    }
+    };
 
-    match customer::delete_customer_by_id(db, oid.unwrap()).await {
-        Ok(customer_doc) => {
-            if customer_doc.is_none() {
-                return Err(MyError::build(
-                    400,
-                    Some(format!("Customer not found with id {}", &id)),
-                ));
-            }
-            Ok(Json(customer_doc.unwrap()))
-        }
-        Err(error) => {
-            println!("{:?}", error);
-            Err(MyError::build(
+    match customer::delete_customer_by_id(db, oid).await {
+        Ok(customer_doc) => match customer_doc {
+            Some(customer_doc) => Ok(Json(customer_doc)),
+            None => Err(MyError::build(
                 400,
                 Some(format!("Customer not found with _id {}", &id)),
-            ))
-        }
+            )),
+        },
+        Err(_error) => Err(MyError::build(
+            400,
+            Some(format!("Customer not found with _id {}", &id)),
+        )),
     }
 }

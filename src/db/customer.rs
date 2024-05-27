@@ -45,16 +45,15 @@ pub async fn find_customer_by_id(
 ) -> mongodb::error::Result<Option<Customer>> {
     let collection = db.collection::<CustomerDocument>("customer");
 
-    let customer_doc = collection.find_one(doc! {"_id":oid }, None).await?;
-    if customer_doc.is_none() {
+    let Some(customer_doc) = collection.find_one(doc! {"_id":oid }, None).await? else {
         return Ok(None);
-    }
-    let unwrapped_doc = customer_doc.unwrap();
+    };
+
     // transform ObjectId to String
     let customer_json = Customer {
-        id: unwrapped_doc.id.to_string(),
-        name: unwrapped_doc.name.to_string(),
-        created_at: unwrapped_doc.created_at.to_string(),
+        id: customer_doc.id.to_string(),
+        name: customer_doc.name.to_string(),
+        created_at: customer_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
@@ -90,23 +89,22 @@ pub async fn update_customer_by_id(
 
     let created_at: DateTime = DateTime::now();
 
-    let customer_doc = collection
+    let Some(customer_doc) = collection
         .find_one_and_update(
             doc! {"_id":oid },
             doc! {"name": input.name.clone(), "createdAt": created_at},
             find_one_and_update_options,
         )
-        .await?;
-
-    if customer_doc.is_none() {
+        .await?
+    else {
         return Ok(None);
-    }
-    let unwrapped_doc = customer_doc.unwrap();
+    };
+
     // transform ObjectId to String
     let customer_json = Customer {
-        id: unwrapped_doc.id.to_string(),
-        name: unwrapped_doc.name.to_string(),
-        created_at: unwrapped_doc.created_at.to_string(),
+        id: customer_doc.id.to_string(),
+        name: customer_doc.name.to_string(),
+        created_at: customer_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
@@ -119,19 +117,18 @@ pub async fn delete_customer_by_id(
     let collection = db.collection::<CustomerDocument>("customer");
 
     // if you just unwrap,, when there is no document it results in 500 error.
-    let customer_doc = collection
+    let Some(customer_doc) = collection
         .find_one_and_delete(doc! {"_id":oid }, None)
-        .await?;
-    if customer_doc.is_none() {
+        .await?
+    else {
         return Ok(None);
-    }
+    };
 
-    let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        id: unwrapped_doc.id.to_string(),
-        name: unwrapped_doc.name.to_string(),
-        created_at: unwrapped_doc.created_at.to_string(),
+        id: customer_doc.id.to_string(),
+        name: customer_doc.name.to_string(),
+        created_at: customer_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
