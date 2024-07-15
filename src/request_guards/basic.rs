@@ -12,7 +12,7 @@ use std::env;
 
 use crate::errors::response::unauthorized_response;
 
-// #[derive(OpenApiFromRequest)]
+#[allow(dead_code)]
 pub struct ApiKey(String);
 
 #[derive(Debug)]
@@ -28,13 +28,14 @@ impl<'r> FromRequest<'r> for ApiKey {
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         fn is_valid(key: &str) -> bool {
             let api_key = env::var("API_KEY").expect("env.API_KEY is not found.");
-            return key == api_key;
+
+            key == api_key
         }
 
         match req.headers().get_one("x-api-key") {
-            None => Outcome::Failure((Status::Unauthorized, ApiKeyError::Missing)),
+            None => Outcome::Error((Status::Unauthorized, ApiKeyError::Missing)),
             Some(key) if is_valid(key) => Outcome::Success(ApiKey(key.to_owned())),
-            Some(_) => Outcome::Failure((Status::Unauthorized, ApiKeyError::Invalid)),
+            Some(_) => Outcome::Error((Status::Unauthorized, ApiKeyError::Invalid)),
         }
     }
 }

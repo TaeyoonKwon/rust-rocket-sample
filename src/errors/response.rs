@@ -1,8 +1,12 @@
-use rocket_okapi::gen::OpenApiGenerator;
-use rocket_okapi::okapi;
-use rocket_okapi::okapi::openapi3::{MediaType, Responses};
-use rocket_okapi::response::OpenApiResponderInner;
-use rocket_okapi::OpenApiError;
+use rocket_okapi::{
+    gen::OpenApiGenerator,
+    okapi::{
+        self,
+        openapi3::{MediaType, Responses},
+    },
+    response::OpenApiResponderInner,
+    OpenApiError,
+};
 
 /// error type
 #[derive(Debug, serde::Serialize, schemars::JsonSchema)]
@@ -24,12 +28,11 @@ pub struct MyError {
 impl MyError {
     // building a custom error.
     pub fn build(code: u16, description: Option<String>) -> MyError {
-        let reason: String;
-        match code {
-            400 => reason = "Bad Request".to_string(),
-            401 => reason = "Unauthorized".to_string(),
-            _ => reason = "Error".to_string(),
-        }
+        let reason = match code {
+            400 => "Bad Request".to_string(),
+            401 => "Unauthorized".to_string(),
+            _ => "Error".to_string(),
+        };
         MyError {
             error: ErrorContent {
                 code,

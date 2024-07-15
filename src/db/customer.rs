@@ -1,15 +1,11 @@
-use crate::models::customer::Customer;
-use crate::models::customer::CustomerDocument;
-use crate::models::customer::CustomerInput;
-
-// use chrono::prelude::*;
+use crate::models::customer::{Customer, CustomerDocument, CustomerInput};
+use chrono::Utc;
 use futures::stream::TryStreamExt;
-use mongodb::bson::oid::ObjectId;
-use mongodb::bson::{doc, DateTime, Document};
-use mongodb::options::FindOneAndUpdateOptions;
-use mongodb::options::FindOptions;
-use mongodb::options::ReturnDocument;
-use mongodb::Database;
+use mongodb::{
+    bson::{doc, oid::ObjectId, DateTime, Document},
+    options::{FindOneAndUpdateOptions, FindOptions, ReturnDocument},
+    Database,
+};
 use rocket::serde::json::Json;
 
 pub async fn find_customer(
@@ -28,14 +24,14 @@ pub async fn find_customer(
 
     let mut customers: Vec<Customer> = vec![];
     while let Some(result) = cursor.try_next().await? {
-        let _id = result._id;
+        let _id = result.id;
         let name = result.name;
-        let created_at = result.createdAt;
+        let created_at = result.created_at;
         // transform ObjectId to String
         let customer_json = Customer {
-            _id: _id.to_string(),
+            id: _id.to_string(),
             name: name.to_string(),
-            createdAt: created_at.to_string(),
+            created_at: created_at.to_string(),
         };
         customers.push(customer_json);
     }
@@ -49,16 +45,15 @@ pub async fn find_customer_by_id(
 ) -> mongodb::error::Result<Option<Customer>> {
     let collection = db.collection::<CustomerDocument>("customer");
 
-    let customer_doc = collection.find_one(doc! {"_id":oid }, None).await?;
-    if customer_doc.is_none() {
+    let Some(customer_doc) = collection.find_one(doc! {"_id":oid }, None).await? else {
         return Ok(None);
-    }
-    let unwrapped_doc = customer_doc.unwrap();
+    };
+
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: unwrapped_doc._id.to_string(),
-        name: unwrapped_doc.name.to_string(),
-        createdAt: unwrapped_doc.createdAt.to_string(),
+        id: customer_doc.id.to_string(),
+        name: customer_doc.name.to_string(),
+        created_at: customer_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
@@ -70,7 +65,7 @@ pub async fn insert_customer(
 ) -> mongodb::error::Result<String> {
     let collection = db.collection::<Document>("customer");
 
-    let created_at: DateTime = DateTime::now();
+    let created_at = Utc::now();
 
     let insert_one_result = collection
         .insert_one(
@@ -94,23 +89,22 @@ pub async fn update_customer_by_id(
 
     let created_at: DateTime = DateTime::now();
 
-    let customer_doc = collection
+    let Some(customer_doc) = collection
         .find_one_and_update(
             doc! {"_id":oid },
             doc! {"name": input.name.clone(), "createdAt": created_at},
             find_one_and_update_options,
         )
-        .await?;
-
-    if customer_doc.is_none() {
+        .await?
+    else {
         return Ok(None);
-    }
-    let unwrapped_doc = customer_doc.unwrap();
+    };
+
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: unwrapped_doc._id.to_string(),
-        name: unwrapped_doc.name.to_string(),
-        createdAt: unwrapped_doc.createdAt.to_string(),
+        id: customer_doc.id.to_string(),
+        name: customer_doc.name.to_string(),
+        created_at: customer_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))
@@ -123,19 +117,18 @@ pub async fn delete_customer_by_id(
     let collection = db.collection::<CustomerDocument>("customer");
 
     // if you just unwrap,, when there is no document it results in 500 error.
-    let customer_doc = collection
+    let Some(customer_doc) = collection
         .find_one_and_delete(doc! {"_id":oid }, None)
-        .await?;
-    if customer_doc.is_none() {
+        .await?
+    else {
         return Ok(None);
-    }
+    };
 
-    let unwrapped_doc = customer_doc.unwrap();
     // transform ObjectId to String
     let customer_json = Customer {
-        _id: unwrapped_doc._id.to_string(),
-        name: unwrapped_doc.name.to_string(),
-        createdAt: unwrapped_doc.createdAt.to_string(),
+        id: customer_doc.id.to_string(),
+        name: customer_doc.name.to_string(),
+        created_at: customer_doc.created_at.to_string(),
     };
 
     Ok(Some(customer_json))

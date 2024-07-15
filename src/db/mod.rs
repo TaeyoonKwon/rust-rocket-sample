@@ -1,6 +1,5 @@
 // use mongodb::bson::{doc, Document};
-use mongodb::options::ClientOptions;
-use mongodb::{Client, Database};
+use mongodb::{options::ClientOptions, Client, Database};
 use rocket::fairing::AdHoc;
 use std::env;
 

@@ -2,8 +2,10 @@
 extern crate rocket;
 
 use dotenv::dotenv;
-use rocket_okapi::openapi_get_routes;
-use rocket_okapi::swagger_ui::{make_swagger_ui, SwaggerUIConfig};
+use rocket_okapi::{
+    openapi_get_routes,
+    swagger_ui::{make_swagger_ui, SwaggerUIConfig},
+};
 
 mod db;
 mod errors;
@@ -17,7 +19,7 @@ fn rocket() -> _ {
     dotenv().ok();
     rocket::build()
         .attach(db::init())
-        .attach(fairings::cors::CORS)
+        .attach(fairings::cors::Cors)
         .mount(
             "/",
             openapi_get_routes![
